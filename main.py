@@ -1,6 +1,9 @@
-print("hi this is first jenkins project ")
+def add(a, b):
+    return a + b
 
-def aa():
-    return "hi thihs first function  new brach is added"
+if __name__ == "__main__":
+    result = add(2, 3)
+    print("Result:", result)
 
-print(aa())
+    # Simple CI check
+    assert result == 5
