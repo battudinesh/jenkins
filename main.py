@@ -1,9 +1,6 @@
-def add(a, b):
-    return a + b
+from fastapi import FastAPI
+app=FastAPI(title="this neww app")
 
-if __name__ == "__main__":
-    result = add(2, 3)
-    print("Result:", result)
-
-    # Simple CI check
-    assert result == 5
+@app.get('/')
+async def wellcome():
+    return {"data":"this is firast data"}
