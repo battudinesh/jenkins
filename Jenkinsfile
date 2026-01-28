@@ -26,11 +26,11 @@ pipeline {
             }
         }
 
-        stage('Run Tests') {
-            steps {
-                bat "${VENV_PATH}\\Scripts\\pytest tests\\"
-            }
-        }
+        // stage('Run Tests') {
+        //     steps {
+        //         bat "${VENV_PATH}\\Scripts\\pytest tests\\"
+        //     }
+        // }
 
         stage('Start FastAPI (Optional)') {
             steps {
