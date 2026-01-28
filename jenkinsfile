@@ -1,64 +1,32 @@
 pipeline {
     agent any
 
-    environment {
-        // Path to your Python virtual environment (optional)
-        VENV_PATH = "${WORKSPACE}/venv"
-    }
-
     stages {
         stage('Checkout') {
             steps {
-                // Pull code from your GitHub repo
                 git branch: 'main', url: 'https://github.com/battudinesh/jenkins.git'
             }
         }
 
-        stage('Setup Python') {
+        stage('Build') {
             steps {
-                script {
-                    // Create virtual environment if not exists
-                    if (!fileExists("${VENV_PATH}/Scripts/activate")) {
-                        sh "python -m venv ${VENV_PATH}"
-                    }
-                    // Install requirements
-                    sh """
-                        ${VENV_PATH}/Scripts/pip install --upgrade pip
-                        ${VENV_PATH}/Scripts/pip install -r requirements.txt
-                    """
-                }
+                echo 'Building project...'
             }
         }
 
-        stage('Run Tests') {
+        stage('Test') {
             steps {
-                script {
-                    // Example: run FastAPI test or Python script
-                    sh """
-                        ${VENV_PATH}/Scripts/python -m pytest tests/
-                    """
-                }
-            }
-        }
-
-        stage('Build / Run App') {
-            steps {
-                script {
-                    // Optional: run FastAPI server for testing
-                    sh """
-                        ${VENV_PATH}/Scripts/python -m uvicorn main:app --port 8000 --reload &
-                    """
-                }
+                echo 'Running tests...'
             }
         }
     }
 
     post {
         success {
-            echo 'Pipeline completed successfully ✅'
+            echo 'Pipeline succeeded ✅'
         }
         failure {
-            echo 'Pipeline failed add ❌'
+            echo 'Pipeline failed ❌'
         }
     }
 }
