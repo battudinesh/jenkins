@@ -1,27 +1,12 @@
 pipeline {
     agent any
 
-    environment {
-        VENV = "venv"
-        APP = "app.main:app"
-        PORT = "8000"
-    }
-
     stages {
 
-        stage('Checkout Code') {
+        stage('Checkout') {
             steps {
                 git branch: 'main',
                     url: 'https://github.com/battudinesh/Jenkins.git'
-            }
-        }
-
-        stage('Setup Virtual Env') {
-            steps {
-                bat '''
-                python -m venv venv
-                venv\\Scripts\\python -m pip install --upgrade pip
-                '''
             }
         }
 
@@ -36,7 +21,12 @@ pipeline {
         stage('Stop Old FastAPI') {
             steps {
                 bat '''
-                for /f "tokens=5" %%a in ('netstat -ano ^| findstr :8000') do taskkill /PID %%a /F
+                netstat -ano | findstr :8000 > pid.txt
+                if %errorlevel%==0 (
+                    for /f "tokens=5" %%a in (pid.txt) do taskkill /PID %%a /F
+                ) else (
+                    echo FastAPI not running
+                )
                 '''
             }
         }
@@ -44,7 +34,7 @@ pipeline {
         stage('Start FastAPI') {
             steps {
                 bat '''
-                start cmd /k "venv\\Scripts\\uvicorn app.main:app --host 0.0.0.0 --port 8000"
+                start "" cmd /c "venv\\Scripts\\uvicorn app.main:app --host 0.0.0.0 --port 8000"
                 '''
             }
         }
@@ -52,10 +42,10 @@ pipeline {
 
     post {
         success {
-            echo "✅ FastAPI deployed successfully"
+            echo "✅ Auto-deploy successful"
         }
         failure {
-            echo "❌ Deployment failed"
+            echo "❌ Auto-deploy failed"
         }
     }
 }
