@@ -2,49 +2,60 @@ pipeline {
     agent any
 
     environment {
-        VENV_PATH = "${WORKSPACE}\\venv"
+        VENV = "venv"
+        APP = "app.main:app"
+        PORT = "8000"
     }
 
     stages {
-        stage('Checkout') {
+
+        stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/battudinesh/Jenkins.git'
+                git branch: 'main',
+                    url: 'https://github.com/battudinesh/Jenkins.git'
             }
         }
 
-        stage('Setup Python') {
+        stage('Setup Virtual Env') {
             steps {
-                script {
-                    if (!fileExists("${VENV_PATH}\\Scripts\\activate")) {
-                        bat "python -m venv ${VENV_PATH}"
-                    }
-                    bat """
-                        ${VENV_PATH}\\Scripts\\pip install --upgrade pip
-                        ${VENV_PATH}\\Scripts\\pip install -r requirements.txt
-                    """
-                }
+                bat '''
+                python -m venv venv
+                venv\\Scripts\\python -m pip install --upgrade pip
+                '''
             }
         }
 
-        // stage('Run Tests') {
-        //     steps {
-        //         bat "${VENV_PATH}\\Scripts\\pytest tests\\"
-        //     }
-        // }
-
-        stage('Start FastAPI (Optional)') {
+        stage('Install Dependencies') {
             steps {
-                bat "start cmd /c ${VENV_PATH}\\Scripts\\python -m uvicorn main:app --port 8000 --reload"
+                bat '''
+                venv\\Scripts\\pip install -r requirements.txt
+                '''
+            }
+        }
+
+        stage('Stop Old FastAPI') {
+            steps {
+                bat '''
+                for /f "tokens=5" %%a in ('netstat -ano ^| findstr :8000') do taskkill /PID %%a /F
+                '''
+            }
+        }
+
+        stage('Start FastAPI') {
+            steps {
+                bat '''
+                start cmd /k "venv\\Scripts\\uvicorn app.main:app --host 0.0.0.0 --port 8000"
+                '''
             }
         }
     }
 
     post {
         success {
-            echo 'Pipeline completed successfully ✅'
+            echo "✅ FastAPI deployed successfully"
         }
         failure {
-            echo 'Pipeline failed ❌'
+            echo "❌ Deployment failed"
         }
     }
 }
