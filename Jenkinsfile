@@ -35,6 +35,7 @@ pipeline {
             steps {
                 bat '''
                 start "" cmd /c "venv\\Scripts\\uvicorn main:app --host 0.0.0.0 --port 8000"
+                echo "runs good"
                 '''
             }
         }
