@@ -18,18 +18,18 @@ pipeline {
             }
         }
 
-        stage('Stop Old FastAPI') {
-            steps {
-                bat '''
-                netstat -ano | findstr :8000 > pid.txt
-                if %errorlevel%==0 (
-                    for /f "tokens=5" %%a in (pid.txt) do taskkill /PID %%a /F
-                ) else (
-                    echo FastAPI not running
-                )
-                '''
-            }
-        }
+        // stage('Stop Old FastAPI') {
+        //     steps {
+        //         bat '''
+        //         netstat -ano | findstr :8000 > pid.txt
+        //         if %errorlevel%==0 (
+        //             for /f "tokens=5" %%a in (pid.txt) do taskkill /PID %%a /F
+        //         ) else (
+        //             echo FastAPI not running
+        //         )
+        //         '''
+        //     }
+        // }
 
         stage('Start FastAPI') {
             steps {
