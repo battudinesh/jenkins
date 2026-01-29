@@ -34,7 +34,7 @@ pipeline {
         stage('Start FastAPI') {
             steps {
                 bat '''
-                start "" cmd /c "venv\\Scripts\\uvicorn app.main:app --host 0.0.0.0 --port 8000"
+                start "" cmd /c "venv\\Scripts\\uvicorn main:app --host 0.0.0.0 --port 8000"
                 '''
             }
         }
